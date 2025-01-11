@@ -1,0 +1,15 @@
+# Package,Description
+avidemux-cli,"A command-line tool for simple video editing and transcoding, useful for basic trimming and re-encoding."
+bc
+dvdbackup,"A tool to rip unencrypted or decrypted DVDs to your hard drive while preserving the directory structure."
+ffmpeg,"A powerful multimedia framework for transcoding, streaming, and processing audio and video files."
+handbrake-cli,"A command-line interface for HandBrake, a tool to convert video from nearly any format to a selection of modern formats."
+libdvdread,"A library for reading DVD video disks, necessary for processing DVD file systems."
+libdvdcss,"A library to decrypt CSS-encrypted DVDs, allowing access to most commercial DVDs."
+libdvdnav,"A library for DVD navigation, enabling reading of DVD menus and navigation data."
+makemkv,"A tool to convert DVD and Blu-ray discs into MKV files while maintaining all tracks and metadata."
+mkvtoolnix-cli,"A collection of command-line tools for creating, editing, and inspecting Matroska (MKV) files."
+pv
+x264,"A free software library and command-line utility for encoding video streams into the H.264/MPEG-4 AVC format."
+x265,"A free software library and command-line utility for encoding video streams into the H.265/HEVC format, offering higher compression."
+vobcopy,"A tool to copy the content of unencrypted DVDs to the hard drive, including VOB files."

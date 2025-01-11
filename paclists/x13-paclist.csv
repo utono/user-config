@@ -1,0 +1,6 @@
+# x13-paclist.csv
+
+evtest
+mpv
+python-evdev, A Python module to interact with input devices
+socat, Allows sending JSON commands to MPV's IPC socket --input-ipc-server

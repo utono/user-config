@@ -1,0 +1,17 @@
+brightnessctl
+btop
+# catppuccin-gtk-theme-mocha, Soothing pastel theme for GTK - Mocha, aur
+hypridle, hyprland's idle daemon
+# hyprpaper, aur
+# hyprshot, aur
+hyprswitch
+nwg-look, GTK3 settings editor adapted to work on wlroots-based compositors
+# starship
+# swaync, a simple notification daemon with a GTK gui for notifications and the control center
+swayidle, idle management daemon for Wayland
+ttf-font-awesome, required for waybar
+ttf-jetbrains-mono-nerd
+waybar
+wev
+wl-clipboard
+# wofi, installed by archinstall

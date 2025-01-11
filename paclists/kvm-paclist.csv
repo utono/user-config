@@ -1,0 +1,9 @@
+qemu-full
+libvirt
+virt-manager
+bridge-utils
+dnsmasq
+edk2-ovmf
+iptables-nft
+vde2
+openbsd-netcat

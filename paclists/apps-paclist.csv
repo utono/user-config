@@ -1,0 +1,38 @@
+# apps-paclist.csv
+archiso
+bat
+bluetuith
+bluez
+bluez-utils
+curl
+eza
+fd
+fzf
+# fzf-tab, https://github.com/Aloxaf/fzf-tab?tab=readme-ov-file#install
+firefox
+git-delta
+gptfdisk, sgdisk
+inxi
+jq
+libnotify
+man-db
+nodejs
+npm
+openssh
+piper
+python-colorama
+ripgrep
+rsync
+starship
+stow
+trash-cli
+tree
+ttf-jetbrains-mono-nerd
+udisks2
+unzip
+yt-dlp
+zathura
+zathura-pdf-poppler
+zip
+zoxide
+

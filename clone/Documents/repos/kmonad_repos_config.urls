@@ -1,0 +1,19 @@
+# keyd_repos_config.sh
+
+# GitHub repositories mapping
+GITHUB_REPOSITORIES+=(
+    # ["dam9000"]="kickstart-modular.nvim"
+    ["j-ace-svg"]="kmonad"
+    ["kmonad"]="kmonad"
+)
+
+# GitHub Gists mapping
+GITHUB_GISTS+=(
+    # ["nic0-lab"]="git@gist.github.com:c435dd4e77b2b3d274d142b126899525.git"
+    # Add gists here if necessary
+)
+
+# GitLab repositories mapping
+GITLAB_REPOSITORIES+=(
+    # ["archlinux"]="archiso"
+)

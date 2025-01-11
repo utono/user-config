@@ -1,0 +1,12 @@
+# pyAudioAnalysis.csv
+base-devel
+python
+python-pip
+ffmpeg
+# python -m venv pyenv
+# source pyenv/bin/activate
+# readlink -f $(which python)
+# pip install pyAudioAnalysis
+# pip install numpy
+# deactivate
+

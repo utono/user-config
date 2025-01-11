@@ -1,0 +1,26 @@
+# wezterm-repos-config.sh
+
+# GitHub repositories mapping
+GITHUB_REPOSITORIES+=(
+    ["akthe-at"]="dotfiles"
+    ["aqez"]="dotfiles"
+    ["FrancescElies"]="wezterm-config"
+    ["gustavofsantos"]="dotfiles-public"
+    ["KevinSilvester"]="wezterm-config"
+    ["sravioli"]="wezterm"
+    ["Sushi3bi"]="dotfiles"
+    ["theopn"]="dotfiles"
+    ["yutkat"]="dotfiles"
+    ["zukuo"]="dotfiles"
+)
+
+# GitHub Gists mapping
+GITHUB_GISTS+=(
+    # ["nic0-lab"]="git@gist.github.com:c435dd4e77b2b3d274d142b126899525.git"
+    # Add gists here if necessary
+)
+
+# GitLab repositories mapping
+GITLAB_REPOSITORIES+=(
+    # ["archlinux"]="archiso"
+)

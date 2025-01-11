@@ -1,0 +1,10 @@
+git@github.com:folke/tokyonight.nvim.git
+git@github.com:dam9000/kickstart-modular.nvim.git
+git@github.com:rafi/vim-config.git
+git@github.com:Traap/barebones.git
+git@github.com:Traap/bootstrap-archlinux.git
+git@github.com:Traap/dotfiles.git
+git@github.com:Traap/lazy.zero.git
+git@github.com:Traap/nvim.git
+git@github.com:Traap/nvims.git
+git@github.com:wincent/wincent.git
