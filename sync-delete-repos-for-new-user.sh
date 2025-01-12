@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# This script moves the contents of source directories into destination directories
-# for the specified user and ensures proper ownership.
+# This script synchronizes the contents of source directories into destination directories
+# for the specified user and ensures proper ownership. Hidden files and directories are included.
 
 # Usage: sudo ./script_name.sh <username>
 # Arguments:
-#   <username> - The username of the user who will own the moved files.
+#   <username> - The username of the user who will own the synchronized files.
 
 # Check if a username argument is provided
 if [[ -z "$1" ]]; then
@@ -29,31 +29,34 @@ declare -A DIRS=(
 # Ensure ~/.config exists and is owned by the user
 mkdir -p "/home/$USERNAME/.config"
 
-# Function to move contents of source directory to destination directory
-move_contents() {
+# Function to synchronize contents of source directory to destination directory
+sync_contents() {
   local source="$1"
   local destination="$2"
-  
+
   if [[ -d "$source" ]]; then
-    echo "Moving contents of '$source/' to '$destination/'."
+    echo "Synchronizing contents of '$source/' to '$destination/'."
     mkdir -p "$destination" # Ensure destination directory exists
-    if ! mv "$source/"* "$destination/"; then
-      echo "Error: Failed to move contents of '$source/' to '$destination/'."
+    if ! rsync -a --progress "$source/" "$destination/"; then
+      echo "Error: Failed to synchronize contents of '$source/' to '$destination/'."
       exit 1
     fi
+    # Delete the source directory after successful sync
+    echo "Deleting source directory '$source'."
+    rm -rf "$source"
   else
-    echo "Directory '$source' does not exist. Skipping move."
+    echo "Directory '$source' does not exist. Skipping synchronization."
   fi
 }
 
-# Move NVIM contents
-move_contents "${DIRS["SOURCE_NVIM"]}" "${DIRS["DESTINATION_NVIM"]}"
+# Synchronize NVIM contents
+sync_contents "${DIRS["SOURCE_NVIM"]}" "${DIRS["DESTINATION_NVIM"]}"
 
-# Move MPV contents
-move_contents "${DIRS["SOURCE_MPV"]}" "${DIRS["DESTINATION_MPV"]}"
+# Synchronize MPV contents
+sync_contents "${DIRS["SOURCE_MPV"]}" "${DIRS["DESTINATION_MPV"]}"
 
-# Move tty-dotfiles contents
-move_contents "${DIRS["TTY_SOURCE"]}" "${DIRS["TTY_DESTINATION"]}"
+# Synchronize tty-dotfiles contents
+sync_contents "${DIRS["TTY_SOURCE"]}" "${DIRS["TTY_DESTINATION"]}"
 
 # Change ownership of ~/utono and its contents to the specified user
 if [[ -d "/home/$USERNAME/utono" ]]; then
@@ -66,7 +69,7 @@ else
   echo "Directory '/home/$USERNAME/utono' does not exist. Skipping ownership change."
 fi
 
-# Change ownership of all moved files and directories
+# Change ownership of all synchronized files and directories
 if ! chown -R "$USERNAME:$USERNAME" \
   "${DIRS["DESTINATION_NVIM"]}" \
   "${DIRS["DESTINATION_MPV"]}" \
@@ -76,4 +79,4 @@ if ! chown -R "$USERNAME:$USERNAME" \
 fi
 
 # Success message
-echo "Move complete. Ownership of 'utono', 'tty-dotfiles', 'mpv', and 'nvim' contents changed to $USERNAME."
+echo "Synchronization complete. Ownership of 'utono', 'tty-dotfiles', 'mpv', and 'nvim' contents changed to $USERNAME."
