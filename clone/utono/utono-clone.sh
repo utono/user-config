@@ -32,6 +32,7 @@ if [ -z "$GITHUB_TOKEN" ]; then
     echo "❌ Error: GITHUB_TOKEN environment variable is not set."
     echo "🔧 Please set your GitHub token with the following command:"
     echo
+    echo "https://github.com/settings/tokens --> ~/.config/shell/exports"
     echo "    export GITHUB_TOKEN='your_personal_access_token'"
     echo
     echo "Or add it to your shell configuration file (~/.bashrc, ~/.zshrc, etc.)"
@@ -117,7 +118,7 @@ clone_repositories() {
 
 # Main Execution
 check_github_token
-initialize_ssh
+# initialize_ssh
 clone_repositories
 
 echo "✅ All repositories belonging to '$githubUser' have been cloned successfully to $targetDir."
