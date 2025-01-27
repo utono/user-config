@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # This script synchronizes the contents of source directories into destination directories
-# for the specified user and ensures proper ownership. Hidden files and directories are included.
+# for the specified user, ensures proper ownership, and marks directories with chattr -V +C.
+# Hidden files and directories are included.
 
 # Usage: sudo ./script_name.sh <username>
 # Arguments:
@@ -26,9 +27,19 @@ declare -A DIRS=(
   ["TTY_DESTINATION"]="/home/$USERNAME/tty-dotfiles"
 )
 
-# Ensure ~/.config exists and is owned by the user
+# Ensure ~/.config exists, is marked with chattr -V +C, and is owned by the user
 mkdir -p "/home/$USERNAME/.config"
-chattr -V +C ~/.config
+chattr -V +C "/home/$USERNAME/.config"
+
+# Function to create a directory with chattr -V +C
+create_directory() {
+  local dir="$1"
+  if [[ ! -d "$dir" ]]; then
+    echo "Creating directory: $dir"
+    mkdir -p "$dir"
+    chattr -V +C "$dir"
+  fi
+}
 
 # Function to synchronize contents of source directory to destination directory
 sync_contents() {
@@ -37,7 +48,7 @@ sync_contents() {
 
   if [[ -d "$source" ]]; then
     echo "Synchronizing contents of '$source/' to '$destination/'."
-    mkdir -p "$destination" # Ensure destination directory exists
+    create_directory "$destination"
     if ! rsync -a --progress "$source/" "$destination/"; then
       echo "Error: Failed to synchronize contents of '$source/' to '$destination/'."
       exit 1
@@ -80,4 +91,4 @@ if ! chown -R "$USERNAME:$USERNAME" \
 fi
 
 # Success message
-echo "Synchronization complete. Ownership of 'utono', 'tty-dotfiles', 'mpv', and 'nvim' contents changed to $USERNAME."
+echo "Synchronization complete. All directories created are marked with chattr -V +C."
