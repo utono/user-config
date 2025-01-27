@@ -1,35 +1,27 @@
 #!/usr/bin/env bash
 
 # This script synchronizes the contents of source directories into destination directories
-# for the specified user, ensures proper ownership, and marks directories with chattr -V +C.
+# for the current user, ensures proper permissions, and marks directories with chattr -V +C.
 # Hidden files and directories are included.
 
-# Usage: sudo ./script_name.sh <username>
-# Arguments:
-#   <username> - The username of the user who will own the synchronized files.
+# Usage: ./script_name.sh
 
-# Check if a username argument is provided
-if [[ -z "$1" ]]; then
-  echo "Usage: $0 <username>"
-  exit 1
-fi
-
-# Assign the provided username to a variable
-USERNAME="$1"
+# Get the username of the current user
+USERNAME=$(whoami)
 
 # Array of source and destination directories
 declare -A DIRS=(
-  ["SOURCE_NVIM"]="/home/$USERNAME/utono/kickstart-modular.nvim"
-  ["DESTINATION_NVIM"]="/home/$USERNAME/.config/nvim"
-  ["SOURCE_MPV"]="/home/$USERNAME/utono/mpv-utono"
-  ["DESTINATION_MPV"]="/home/$USERNAME/.config/mpv"
-  ["TTY_SOURCE"]="/home/$USERNAME/utono/tty-dotfiles"
-  ["TTY_DESTINATION"]="/home/$USERNAME/tty-dotfiles"
+  ["SOURCE_NVIM"]="$HOME/utono/kickstart-modular.nvim"
+  ["DESTINATION_NVIM"]="$HOME/.config/nvim"
+  ["SOURCE_MPV"]="$HOME/utono/mpv-utono"
+  ["DESTINATION_MPV"]="$HOME/.config/mpv"
+  ["TTY_SOURCE"]="$HOME/utono/tty-dotfiles"
+  ["TTY_DESTINATION"]="$HOME/tty-dotfiles"
 )
 
-# Ensure ~/.config exists, is marked with chattr -V +C, and is owned by the user
-mkdir -p "/home/$USERNAME/.config"
-chattr -V +C "/home/$USERNAME/.config"
+# Ensure ~/.config exists and is marked with chattr -V +C
+mkdir -p "$HOME/.config"
+chattr -V +C "$HOME/.config"
 
 # Function to create a directory with chattr -V +C
 create_directory() {
@@ -70,18 +62,15 @@ sync_contents "${DIRS["SOURCE_MPV"]}" "${DIRS["DESTINATION_MPV"]}"
 # Synchronize tty-dotfiles contents
 sync_contents "${DIRS["TTY_SOURCE"]}" "${DIRS["TTY_DESTINATION"]}"
 
-# Change ownership of ~/utono and its contents to the specified user
-if [[ -d "/home/$USERNAME/utono" ]]; then
-  echo "Changing ownership of '/home/$USERNAME/utono' and its contents to $USERNAME."
-  if ! chown -R "$USERNAME:$USERNAME" "/home/$USERNAME/utono"; then
-    echo "Error: Failed to change ownership of '/home/$USERNAME/utono'."
-    exit 1
-  fi
+# Ensure ownership of ~/utono is consistent (no root required here)
+if [[ -d "$HOME/utono" ]]; then
+  echo "Ensuring ownership of '$HOME/utono' and its contents is set to $USERNAME."
+  chown -R "$USERNAME:$USERNAME" "$HOME/utono"
 else
-  echo "Directory '/home/$USERNAME/utono' does not exist. Skipping ownership change."
+  echo "Directory '$HOME/utono' does not exist. Skipping ownership change."
 fi
 
-# Change ownership of all synchronized files and directories
+# Ensure ownership of all synchronized files and directories
 if ! chown -R "$USERNAME:$USERNAME" \
   "${DIRS["DESTINATION_NVIM"]}" \
   "${DIRS["DESTINATION_MPV"]}" \
