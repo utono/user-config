@@ -28,6 +28,7 @@ declare -A DIRS=(
 
 # Ensure ~/.config exists and is owned by the user
 mkdir -p "/home/$USERNAME/.config"
+chattr -V +C ~/.config
 
 # Function to synchronize contents of source directory to destination directory
 sync_contents() {
