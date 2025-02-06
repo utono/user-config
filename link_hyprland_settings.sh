@@ -32,7 +32,7 @@ git fetch upstream
 echo "Fetched updates from remote repository."
 
 # Merge changes from the remote master branch into the local branch
-git merge upstream/master -m "Merge updates from upstream master"
+git merge upstream/master --allow-unrelated-histories -m "Merge updates from upstream master"
 echo "Merged updates from upstream master into the local branch."
 
 # Ensure target and backup directories exist
