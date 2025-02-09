@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Usage: ./utono-repo-sync.sh ~/utono
+
 # Description: Script to clone or update GitHub repositories belonging to the GitHub user 'utono'.
 # The script requires the user to set the GITHUB_TOKEN environment variable.
 # It prompts the user to confirm the token before proceeding.

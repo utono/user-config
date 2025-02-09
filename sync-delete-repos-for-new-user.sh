@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
+# Usage: ./sync-delete-repos-for-new-user.sh
+
 # This script synchronizes the contents of source directories into destination directories
 # for the current user, ensures proper permissions, and marks directories with chattr -V +C.
 # Hidden files and directories are included.
-
-# Usage: ./script_name.sh
 
 # Get the username of the current user
 USERNAME=$(whoami)

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 # This script synchronizes a local fork of a repository with its remote parent,
-# fetches updates, merges changes, and creates symbolic links in the target
-# directory (~/.config) pointing to the source configuration directory.
-# Conflicting files or directories in the target are backed up.
+# fetches updates, and creates symbolic links in the target directory (~/.config)
+# pointing to the source configuration directory. Conflicting files or directories
+# in the target are backed up.
 
 # Set repository paths and directories
 REPO_DIR="$HOME/utono/cachyos-hyprland-settings"
@@ -21,19 +21,9 @@ fi
 # Navigate to the repository
 cd "$REPO_DIR" || exit
 
-# Add the remote repository if not already added
-if ! git remote | grep -q "^upstream$"; then
-    git remote add upstream "$REMOTE_REPO"
-    echo "Added remote repository: $REMOTE_REPO"
-fi
-
 # Fetch updates from the remote repository
-git fetch upstream
+git fetch origin
 echo "Fetched updates from remote repository."
-
-# Merge changes from the remote master branch into the local branch
-git merge upstream/master --allow-unrelated-histories -m "Merge updates from upstream master"
-echo "Merged updates from upstream master into the local branch."
 
 # Ensure target and backup directories exist
 mkdir -p "$TARGET"
