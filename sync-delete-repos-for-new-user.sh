@@ -8,7 +8,6 @@
 # This script works for any user and can be run without root privileges.
 
 # Ensure the utono directory is passed as a parameter
-
 if [ -z "$1" ]; then
     echo "❌ Error: Missing required parameter <utono_directory>."
     exit 1
@@ -65,7 +64,12 @@ manage_repositories() {
             [[ -d "$repo/.git" ]] || continue
             echo "🔄 Updating repository $repo..."
             cd "$repo" || continue
-            git pull origin main || git pull origin master
+            branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null)
+            if [[ "$branch" == "main" ]]; then
+                git pull origin main
+            else
+                git pull origin master
+            fi
             cd "$dir" || exit
         done
     done
