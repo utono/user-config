@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Usage: ./script.sh <utono_directory>
-#
+
 # Description: Script to clone or update GitHub repositories belonging to the GitHub user 'utono'.
 # The script requires the user to set the GITHUB_TOKEN environment variable.
 # It prompts the user to confirm the token before proceeding.
