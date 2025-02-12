@@ -1,83 +1,83 @@
 #!/usr/bin/env bash
 
-# Usage: ./script.sh <utono_directory>
-#
-# Description: Script to clone or update GitHub repositories belonging to the GitHub user 'utono'.
-# The script requires the user to set the GITHUB_TOKEN environment variable.
-# It prompts the user to confirm the token before proceeding.
-# This script works for any user and can be run without root privileges.
+# Usage: ./sync-delete-repos-for-new-user.sh
 
-# Ensure the utono directory is passed as a parameter
-if [ -z "$1" ]; then
-    echo "❌ Error: Missing required parameter <utono_directory>."
-    exit 1
-fi
+# This script synchronizes the contents of source directories into destination directories
+# for the current user, ensures proper permissions, and marks directories with chattr -V +C.
+# Hidden files and directories are included.
 
-UTONO_DIR="$1"
+# Get the username of the current user
+USERNAME=$(whoami)
 
-# Array of non-utono directories containing repositories
-declare -A EXTERNAL_REPO_DIRS=(
+# Array of source and destination directories
+declare -A DIRS=(
+  ["SOURCE_NVIM"]="$HOME/utono/kickstart-modular.nvim"
   ["DESTINATION_NVIM"]="$HOME/.config/nvim"
+  ["SOURCE_MPV"]="$HOME/utono/mpv-utono"
   ["DESTINATION_MPV"]="$HOME/.config/mpv"
+  ["TTY_SOURCE"]="$HOME/utono/tty-dotfiles"
   ["TTY_DESTINATION"]="$HOME/tty-dotfiles"
 )
 
-# Ensure GITHUB_TOKEN is set
-if [ -z "$GITHUB_TOKEN" ]; then
-    echo "❌ Error: GITHUB_TOKEN environment variable is not set."
-    exit 1
-fi
+# Ensure ~/.config exists and is marked with chattr -V +C
+mkdir -p "$HOME/.config"
+chattr -V +C "$HOME/.config"
 
-echo "🔍 Using GitHub token (partial view): ${GITHUB_TOKEN:0:4}...${GITHUB_TOKEN: -4}"
-read -p "⚠️  Do you want to use this token? (yes/no): " confirm
-if [[ "$confirm" != "yes" ]]; then
-    echo "Operation cancelled by user."
-    exit 1
-fi
+# Function to create a directory with chattr -V +C
+create_directory() {
+  local dir="$1"
+  if [[ ! -d "$dir" ]]; then
+    echo "Creating directory: $dir"
+    mkdir -p "$dir"
+    chattr -V +C "$dir"
+  fi
+}
 
-# Check if jq is installed
-if ! command -v jq &> /dev/null; then
-    echo "❌ Error: jq is required to parse JSON responses. Please install jq."
-    exit 1
-fi
+# Function to synchronize contents of source directory to destination directory
+sync_contents() {
+  local source="$1"
+  local destination="$2"
 
-# Validate GitHub token
-check_github_token() {
-    echo "🔍 Verifying GitHub token..."
-    local http_status
-    http_status=$(curl -o /dev/null -s -w "%{http_code}\n" -H "Authorization: token ${GITHUB_TOKEN}" https://api.github.com/user)
-    if [[ "$http_status" -ne 200 ]]; then
-        echo "❌ Error: Invalid or expired GitHub token. HTTP status: $http_status"
-        exit 1
+  if [[ -d "$source" ]]; then
+    echo "Synchronizing contents of '$source/' to '$destination/'."
+    create_directory "$destination"
+    if ! rsync -a --progress "$source/" "$destination/"; then
+      echo "Error: Failed to synchronize contents of '$source/' to '$destination/'."
+      exit 1
     fi
-    echo "✅ GitHub token verified successfully."
+    # Delete the source directory after successful sync
+    echo "Deleting source directory '$source'."
+    rm -rf "$source"
+  else
+    echo "Directory '$source' does not exist. Skipping synchronization."
+  fi
 }
 
-# Clone or update repositories
-manage_repositories() {
-    local dirs=("$UTONO_DIR" "${EXTERNAL_REPO_DIRS[DESTINATION_NVIM]}" "${EXTERNAL_REPO_DIRS[DESTINATION_MPV]}" "${EXTERNAL_REPO_DIRS[TTY_DESTINATION]}")
-    for dir in "${dirs[@]}"; do
-        [[ -d "$dir" ]] || continue
-        echo "📂 Checking repositories in $dir..."
-        cd "$dir" || continue
-        for repo in */; do
-            [[ -d "$repo/.git" ]] || continue
-            echo "🔄 Updating repository $repo..."
-            cd "$repo" || continue
-            branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null)
-            if [[ "$branch" == "main" ]]; then
-                git pull origin main
-            else
-                git pull origin master
-            fi
-            cd "$dir" || exit
-        done
-    done
-}
+# Synchronize NVIM contents
+sync_contents "${DIRS["SOURCE_NVIM"]}" "${DIRS["DESTINATION_NVIM"]}"
 
-# Main Execution
-check_github_token
-manage_repositories
+# Synchronize MPV contents
+sync_contents "${DIRS["SOURCE_MPV"]}" "${DIRS["DESTINATION_MPV"]}"
 
-echo "✅ Repository update completed."
-exit 0
+# Synchronize tty-dotfiles contents
+sync_contents "${DIRS["TTY_SOURCE"]}" "${DIRS["TTY_DESTINATION"]}"
+
+# Ensure ownership of ~/utono is consistent (no root required here)
+if [[ -d "$HOME/utono" ]]; then
+  echo "Ensuring ownership of '$HOME/utono' and its contents is set to $USERNAME."
+  chown -R "$USERNAME:$USERNAME" "$HOME/utono"
+else
+  echo "Directory '$HOME/utono' does not exist. Skipping ownership change."
+fi
+
+# Ensure ownership of all synchronized files and directories
+if ! chown -R "$USERNAME:$USERNAME" \
+  "${DIRS["DESTINATION_NVIM"]}" \
+  "${DIRS["DESTINATION_MPV"]}" \
+  "${DIRS["TTY_DESTINATION"]}"; then
+  echo "Error: Failed to change ownership of destination directories."
+  exit 1
+fi
+
+# Success message
+echo "Synchronization complete. All directories created are marked with chattr -V +C."
