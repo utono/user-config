@@ -32,8 +32,8 @@ clone_repo() {
         return 1
     fi
 
-    local username="$(echo "$user_and_repo" | awk '{print $1}')"
-    local repo_name="$(echo "$user_and_repo" | awk '{print $2}')"
+    local username repo_name
+    read -r username repo_name <<< "$user_and_repo"
 
     local target_dir="${REPOS_BASE}/${username}/${repo_name}"
 
@@ -49,15 +49,15 @@ clone_repo() {
 
 # Function to process all repository URLs
 clone_all_repos() {
-    while IFS= read -r repo_url; do
+    while IFS= read -r repo_url || [[ -n "$repo_url" ]]; do
         [[ -z "$repo_url" || "$repo_url" =~ ^# ]] && continue # Skip empty lines or comments
         echo "Cloning repository: $repo_url"
         clone_repo "$repo_url"
     done < "$1"
 }
 
-# Ensure only one argument is passed
-if [ "$#" -ne 1 ]; then
+# Ensure exactly one argument is passed
+if [[ "$#" -ne 1 ]]; then
     echo "Usage: $0 <url-list-file>"
     exit 1
 fi
