@@ -2,6 +2,9 @@
 
 # Usage: ./utono-clone-repos.sh ~/utono
 # Clones all GitHub repositories belonging to 'utono' into the target directory.
+#
+# GITHUB_TOKEN must not be expired:
+# https://github.com/settings/tokens
 
 if [ $# -lt 1 ]; then
     echo "❌ Error: Missing target directory. Usage: $0 <target_directory>"
