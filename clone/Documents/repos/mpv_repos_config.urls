@@ -1,19 +1,12 @@
-# repos_config.sh
+git@github.com:CogentRedTester/mpv-scroll-list.git
+git@github.com:dyphire/mpv-scripts.git
+git@github.com:mar04/chapters_for_mpv.git
 
 # GitHub repositories mapping
-GITHUB_REPOSITORIES+=(
-    # ["dam9000"]="kickstart-modular.nvim"
-    ["mar04"]="chapters_for_mpv"
-    ["oltodosel"]="mpv-scripts"
-)
+# GITHUB_REPOSITORIES+=(
+#     # ["dam9000"]="kickstart-modular.nvim"
+#     ["mar04"]="chapters_for_mpv"
+#     ["oltodosel"]="mpv-scripts"
+#     ["CogentRedTester"]="mpv-scroll-list"
+# )
 
-# GitHub Gists mapping
-GITHUB_GISTS+=(
-    # ["nic0-lab"]="git@gist.github.com:c435dd4e77b2b3d274d142b126899525.git"
-    # Add gists here if necessary
-)
-
-# GitLab repositories mapping
-GITLAB_REPOSITORIES+=(
-    # ["archlinux"]="archiso"
-)
