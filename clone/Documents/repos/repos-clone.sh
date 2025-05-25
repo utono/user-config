@@ -1,24 +1,34 @@
 #!/usr/bin/env bash
 
-# This script clones repositories from a list of Git URLs provided in a single
-# text file passed as an argument. It prompts for a subdirectory under
-# ~/Documents/repos (default: no subdirectory), cloning into:
-# ~/Documents/repos/<subdir>/<username>/<repository>/
+# Clone Git repositories listed in a *.urls file into
+# ~/Documents/repos/<default-dir>/<username>/<repository>/
+# The default dir is derived from the basename of the *.urls parameter.
 
 set -e  # Exit on error
 
-# Base directory
 DEFAULT_BASE="$HOME/Documents/repos"
 
-# Prompt user for subdirectory under ~/Documents/repos
-read -rp "Enter subdirectory under ~/Documents/repos (leave blank for none): " SUBDIR
-
-# Final base directory
-if [[ -n "$SUBDIR" ]]; then
-    REPOS_BASE="${DEFAULT_BASE}/${SUBDIR}"
-else
-    REPOS_BASE="$DEFAULT_BASE"
+# Ensure exactly one argument is passed
+if [[ "$#" -ne 1 ]]; then
+    echo "Usage: $0 <url-list-file>"
+    exit 1
 fi
+
+url_list_file="$1"
+
+if [[ ! -f "$url_list_file" ]]; then
+    echo "URL list file $url_list_file not found"
+    exit 1
+fi
+
+# Get default subdirectory from basename (strip .urls extension)
+default_dir="$(basename "${url_list_file%.urls}")"
+
+# Prompt user for subdirectory under ~/Documents/repos
+read -rp "Enter subdirectory under ~/Documents/repos (default: $default_dir): " SUBDIR
+SUBDIR="${SUBDIR:-$default_dir}"
+
+REPOS_BASE="${DEFAULT_BASE}/${SUBDIR}"
 
 # Function to extract GitHub username and repository name
 extract_user_and_repo() {
@@ -33,7 +43,6 @@ extract_user_and_repo() {
 # Function to clone a repository
 clone_repo() {
     local repo_url="$1"
-
     local user_and_repo
     user_and_repo=$(extract_user_and_repo "$repo_url")
 
@@ -57,27 +66,14 @@ clone_repo() {
     echo
 }
 
-# Function to process all repository URLs
+# Process all repository URLs in the list
 clone_all_repos() {
     while IFS= read -r repo_url || [[ -n "$repo_url" ]]; do
         [[ -z "$repo_url" || "$repo_url" =~ ^# ]] && continue
         echo "Cloning repository: $repo_url"
         clone_repo "$repo_url"
-    done < "$1"
+    done < "$url_list_file"
 }
 
-# Ensure exactly one argument is passed
-if [[ "$#" -ne 1 ]]; then
-    echo "Usage: $0 <url-list-file>"
-    exit 1
-fi
-
-url_list_file="$1"
-
-if [[ ! -f "$url_list_file" ]]; then
-    echo "URL list file $url_list_file not found"
-    exit 1
-fi
-
 # Start cloning process
-clone_all_repos "$url_list_file"
+clone_all_repos
