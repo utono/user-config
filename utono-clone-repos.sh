@@ -26,8 +26,10 @@ if ! command -v jq &>/dev/null; then
     exit 1
 fi
 
-echo "📡 Fetching repository list..."
-repoList=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" "https://api.github.com/user/repos?per_page=100&visibility=all" | jq -r '.[].ssh_url')
+echo "📡 Fetching repository list for '$githubUser'..."
+repoList=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
+  "https://api.github.com/user/repos?per_page=100&visibility=all" | \
+  jq -r '.[].ssh_url')
 
 if [ -z "$repoList" ]; then
     echo "⚠️ No repositories found for user '${githubUser}'."
@@ -40,7 +42,10 @@ for repo in $repoList; do
     repo_name=$(basename "$repo" .git)
     if [ ! -d "$repo_name" ]; then
         echo "📥 Cloning $repo_name..."
-        git clone --depth 1 "$repo" || { echo "❌ Error cloning $repo_name"; }
+        git clone --config remote.origin.fetch='+refs/heads/*:refs/remotes/origin/*' \
+          --depth 1 "$repo" || {
+            echo "❌ Error cloning $repo_name"
+          }
     else
         echo "✅ Repository '$repo_name' already exists, skipping..."
     fi
