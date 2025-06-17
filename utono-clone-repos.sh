@@ -26,6 +26,9 @@ if ! command -v jq &>/dev/null; then
     exit 1
 fi
 
+logFile="$HOME/utono/user-config/utono-clone-failures.log"
+: > "$logFile"  # Clear previous log contents
+
 echo "📡 Fetching repository list for '$githubUser'..."
 repoList=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
   "https://api.github.com/user/repos?per_page=100&visibility=all" | \
@@ -40,16 +43,37 @@ cd "$targetDir" || { echo "❌ Error: Failed to enter $targetDir"; exit 1; }
 
 for repo in $repoList; do
     repo_name=$(basename "$repo" .git)
-    if [ ! -d "$repo_name" ]; then
-        echo "📥 Cloning $repo_name..."
-        git clone --config remote.origin.fetch='+refs/heads/*:refs/remotes/origin/*' \
-          --depth 1 "$repo" || {
-            echo "❌ Error cloning $repo_name"
-          }
-    else
+    if [ -d "$repo_name" ]; then
         echo "✅ Repository '$repo_name' already exists, skipping..."
+        continue
     fi
+
+    echo "📥 Cloning $repo_name..."
+
+    # Try default clone
+    if git clone --config remote.origin.fetch='+refs/heads/*:refs/remotes/origin/*' --depth 1 "$repo"; then
+        continue
+    fi
+
+    echo "⚠️ Default clone failed for $repo_name. Retrying with --single-branch --branch master..."
+    if git clone --depth 1 --single-branch --branch master "$repo"; then
+        continue
+    fi
+
+    echo "⚠️ Retry with 'master' failed. Trying with --single-branch --branch main..."
+    if git clone --depth 1 --single-branch --branch main "$repo"; then
+        continue
+    fi
+
+    echo "⚠️ Retry with 'main' failed. Trying with --no-tags..."
+    if git clone --depth 1 --no-tags "$repo"; then
+        continue
+    fi
+
+    echo "❌ Error cloning $repo_name: All fallback attempts failed."
+    echo "$repo_name ($repo)" >> "$logFile"
 done
 
 echo "✅ Cloning complete."
+echo "📄 Failed repositories (if any) logged to: $logFile"
 exit 0
